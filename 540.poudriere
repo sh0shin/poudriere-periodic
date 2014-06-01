@@ -1,0 +1,62 @@
+#!/bin/sh -
+#
+# $FreeBSD$
+#
+
+if [ -r /etc/defaults/periodic.conf ]; then
+	. /etc/defaults/periodic.conf
+	source_periodic_confs
+fi
+
+rc=0
+poudrierecmd=/usr/local/bin/poudriere
+
+case "${daily_poudriere_update_ports_enable:-YES}" in
+	[Nn][Oo])
+	;;
+	*)
+		if [ -z "$daily_poudriere_update_ports_name" ]; then
+			daily_poudriere_update_ports_name=default
+		fi
+
+		portsup=`$poudrierecmd ports -u -p $daily_poudriere_update_ports_name`
+
+		if [ $? -gt 0 ]; then
+			echo "$portsup"
+			exit $?
+		fi
+	;;
+esac
+
+case "${daily_poudriere_check_bulk_enable:-YES}" in
+	[Nn][Oo])
+	;;
+	*)
+		if [ -z  "${daily_poudriere_check_bulk_jails}" ]; then
+			daily_poudriere_check_bulk_jails=`$poudrierecmd jail -l | awk '!/JAILNAME/ {print $1}'`
+		fi
+
+		if [ -z "${daily_poudriere_check_bulk_pkglist}" ]; then
+			daily_poudriere_check_bulk_pkglist=/usr/local/etc/poudriere.d/pkglist
+		fi
+
+		for jail in ${daily_poudriere_check_bulk_jails}; do
+
+			checkjail=`$poudrierecmd bulk -n -j $jail -f $daily_poudriere_check_bulk_pkglist`
+			if [ $? -gt 1 ]; then
+				echo "$checkjail"
+				exit $?
+			fi
+
+			buildports=`echo "$checkjail" | awk -F'> ' '/Ports to build:/ {print $NF}'`
+			if [ -n "$buildports" ]; then
+				echo "Poudriere jail ${jail}:"
+				echo "$checkjail" | awk -F'> ' '/Deleting.* (new version|missing dependency)/ {print $NF}'
+				echo "$buildports"
+				echo
+			fi
+		done
+	;;
+esac
+
+exit $rc
