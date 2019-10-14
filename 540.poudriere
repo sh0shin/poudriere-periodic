@@ -28,7 +28,7 @@ case "${daily_poudriere_update_ports_enable:-YES}" in
 	;;
 esac
 
-case "${daily_poudriere_check_bulk_enable:-YES}" in
+case "${daily_poudriere_check_bulk_enable:-NO}" in
 	[Nn][Oo])
 	;;
 	*)
@@ -37,7 +37,7 @@ case "${daily_poudriere_check_bulk_enable:-YES}" in
 		fi
 
 		if [ -z "${daily_poudriere_check_bulk_pkglist}" ]; then
-			daily_poudriere_check_bulk_pkglist=/usr/local/etc/poudriere.d/pkglist
+			daily_poudriere_check_bulk_pkglist=/usr/local/etc/poudriere.d/ports-list
 		fi
 
 		for jail in ${daily_poudriere_check_bulk_jails}; do

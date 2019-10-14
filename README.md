@@ -1,7 +1,6 @@
 # poudriere-periodic
 
-A daily FreeBSD periodic script for poudriere,
-based on poudriere-devel-3.0.99.20140517\_1
+A daily FreeBSD periodic script for poudriere.
 
 ## installation
 
@@ -13,8 +12,7 @@ based on poudriere-devel-3.0.99.20140517\_1
 	daily_poudriere_update_ports_enable="YES"           # default: YES
 	daily_poudriere_update_ports_name="myports"         # default: default
 
-	daily_poudriere_check_bulk_enable="YES"             # default: YES
+	daily_poudriere_check_bulk_enable="YES"             # default: NO
 	daily_poudriere_check_bulk_jails="myjail"           # default: all jails
-	daily_poudriere_check_bulk_pkglist="path/to/mypkgs" # default: /usr/local/etc/poudriere.d/pkglist
+	daily_poudriere_check_bulk_pkglist="path/to/mypkgs" # default: /usr/local/etc/poudriere.d/ports-list
 
-to be continued...
